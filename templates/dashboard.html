@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+
+{% block title %}Executive Energy Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h2 class="fw-bold mb-1">Energy Intelligence Dashboard</h2>
+    <p class="text-muted small mb-0">Real-time consumption telemetry, AI forecasting, and sustainability metrics</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('prediction') }}" class="btn btn-primary-custom">
+      <i class="bi bi-cpu-fill"></i> Predict Energy
+    </a>
+    <a href="{{ url_for('upload') }}" class="btn btn-outline-custom">
+      <i class="bi bi-upload"></i> Upload CSV
+    </a>
+  </div>
+</div>
+
+<!-- ==========================================
+     1. TOP KPI METRICS ROW
+     ========================================== -->
+<div class="row g-3 mb-4">
+  <!-- Card 1: Total & Daily Energy -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="glass-card kpi-card h-100">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="kpi-label">Daily Average Load</div>
+          <div class="kpi-value">{{ daily_kwh_est }} <span class="fs-6 fw-normal text-muted">kWh/day</span></div>
+          <div class="kpi-subtext"><i class="bi bi-clock-history me-1 text-emerald"></i> Avg hourly: {{ avg_hourly_kwh }} kWh</div>
+        </div>
+        <div class="kpi-icon-wrapper kpi-emerald">
+          <i class="bi bi-lightning-charge-fill"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 2: Estimated Monthly Electricity Bill -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="glass-card kpi-card h-100">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="kpi-label">Estimated Monthly Bill</div>
+          <div class="kpi-value">₹{{ cost_info.monthly_cost }}</div>
+          <div class="kpi-subtext"><i class="bi bi-tag-fill me-1 text-cyan"></i> Tariff: ₹{{ user.tariff_rate }}/kWh</div>
+        </div>
+        <div class="kpi-icon-wrapper kpi-cyan">
+          <i class="bi bi-currency-rupee"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3: Carbon Footprint & Trees Needed -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="glass-card kpi-card h-100">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="kpi-label">Monthly CO₂ Emissions</div>
+          <div class="kpi-value">{{ co2_info.monthly_co2_kg }} <span class="fs-6 fw-normal text-muted">kg</span></div>
+          <div class="kpi-subtext"><i class="bi bi-tree-fill me-1 text-emerald"></i> Offset: ~{{ co2_info.trees_needed_to_offset }} urban trees</div>
+        </div>
+        <div class="kpi-icon-wrapper kpi-amber">
+          <i class="bi bi-cloud-haze2-fill"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 4: Energy Saving Potential -->
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="glass-card kpi-card h-100">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <div class="kpi-label">Saving Potential</div>
+          <div class="kpi-value text-emerald">-{{ savings_info.reduction_pct }}%</div>
+          <div class="kpi-subtext"><i class="bi bi-piggy-bank-fill me-1 text-emerald"></i> Save ₹{{ savings_info.monthly_savings }}/mo</div>
+        </div>
+        <div class="kpi-icon-wrapper kpi-rose">
+          <i class="bi bi-shield-check"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     2. ANOMALY / ENERGY-WASTING ALERT BANNER
+     ========================================== -->
+{% if anomalies_count > 0 %}
+<div class="glass-card mb-4" style="border-left: 4px solid var(--accent-rose); background: rgba(244, 63, 94, 0.06);">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+    <div class="d-flex align-items-center gap-3">
+      <div class="brand-icon" style="background: rgba(244, 63, 94, 0.2); color: var(--accent-rose);">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+      </div>
+      <div>
+        <h5 class="fw-bold mb-1 text-rose" style="color: #fb7185;">Energy-Wasting Pattern Detected</h5>
+        <div class="text-muted small">
+          Identified <strong>{{ anomalies_count }} anomalous usage spikes</strong>. Highest consuming device: <strong>{{ highest_appliance }}</strong>.
+        </div>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="{{ url_for('appliances') }}" class="btn btn-sm btn-outline-custom">View Anomaly Log</a>
+      <a href="{{ url_for('recommendations') }}" class="btn btn-sm btn-primary-custom">Apply Fixes</a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- ==========================================
+     3. INTERACTIVE CHARTS ROW
+     ========================================== -->
+<div class="row g-4 mb-4">
+  <!-- Time Series Chart -->
+  <div class="col-12 col-xl-8">
+    <div class="glass-card h-100">
+      <div class="glass-card-header">
+        <div>
+          <h5 class="fw-bold mb-0">Historical & Simulated Energy Telemetry</h5>
+          <span class="text-muted small">Continuous power consumption trajectory (kWh)</span>
+        </div>
+        <span class="badge badge-normal"><i class="bi bi-activity me-1"></i> Active Feed</span>
+      </div>
+      <div style="height: 310px; position: relative;">
+        <canvas id="energyTimeSeriesChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Appliance Donut Chart -->
+  <div class="col-12 col-xl-4">
+    <div class="glass-card h-100">
+      <div class="glass-card-header">
+        <div>
+          <h5 class="fw-bold mb-0">Appliance Consumption Share</h5>
+          <span class="text-muted small">Daily power distribution breakdown</span>
+        </div>
+        <a href="{{ url_for('appliances') }}" class="btn btn-sm btn-outline-custom p-1 px-2"><i class="bi bi-gear"></i></a>
+      </div>
+      <div style="height: 310px; position: relative;">
+        <canvas id="applianceDonutChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     4. HOURLY LOAD PROFILE & AI MODEL ACCURACY
+     ========================================== -->
+<div class="row g-4 mb-4">
+  <!-- 24-Hour Diurnal Profile -->
+  <div class="col-12 col-lg-7">
+    <div class="glass-card h-100">
+      <div class="glass-card-header">
+        <div>
+          <h5 class="fw-bold mb-0">24-Hour Diurnal Load Profile</h5>
+          <span class="text-muted small">Average consumption by hour of day (Peak vs Non-Peak)</span>
+        </div>
+      </div>
+      <div style="height: 250px; position: relative;">
+        <canvas id="hourlyProfileChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Machine Learning Benchmarking -->
+  <div class="col-12 col-lg-5">
+    <div class="glass-card h-100">
+      <div class="glass-card-header">
+        <div>
+          <h5 class="fw-bold mb-0">ML Model Benchmark</h5>
+          <span class="text-muted small">Evaluated on {{ metrics_data.total_testing_samples }} test instances</span>
+        </div>
+        <span class="badge badge-priority-high" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.4);">
+          Best: {{ metrics_data.best_model }}
+        </span>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>MAE</th>
+              <th>RMSE</th>
+              <th>R² Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for name, m in metrics_data.models.items() %}
+            <tr {% if name == metrics_data.best_model %}style="background: rgba(16, 185, 129, 0.08); font-weight: 600;"{% endif %}>
+              <td>
+                {% if name == metrics_data.best_model %}<i class="bi bi-star-fill text-warning me-1"></i>{% endif %}
+                {{ name }}
+              </td>
+              <td>{{ m.mae }}</td>
+              <td>{{ m.rmse }}</td>
+              <td>
+                <span class="badge badge-normal">{{ m.r2_score }}</span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-3 text-end">
+        <a href="{{ url_for('prediction') }}" class="small fw-semibold text-emerald">
+          Test live inference with custom parameters <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     5. QUICK RECOMMENDATIONS PANEL
+     ========================================== -->
+<div class="glass-card mb-4">
+  <div class="glass-card-header">
+    <div>
+      <h5 class="fw-bold mb-0">Prioritized Sustainability Recommendations</h5>
+      <span class="text-muted small">Dynamic suggestions generated by rule engine & consumption patterns</span>
+    </div>
+    <a href="{{ url_for('recommendations') }}" class="btn btn-sm btn-outline-custom">View All Actions</a>
+  </div>
+
+  <div class="row g-3">
+    {% for rec in recommendations %}
+    <div class="col-12 col-md-6 col-lg-3">
+      <div class="rec-card h-100 {% if rec.priority == 'High' %}high-priority{% elif rec.priority == 'Medium' %}med-priority{% else %}low-priority{% endif %}">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <span class="small fw-semibold text-muted text-uppercase">{{ rec.category }}</span>
+          <span class="badge {% if rec.priority == 'High' %}badge-priority-high{% elif rec.priority == 'Medium' %}badge-priority-medium{% else %}badge-priority-low{% endif %}">
+            {{ rec.priority }}
+          </span>
+        </div>
+        <h6 class="fw-bold mb-2">{{ rec.title }}</h6>
+        <p class="text-dim small mb-3">{{ rec.description[:110] }}...</p>
+        <div class="d-flex justify-content-between align-items-center pt-2 border-top border-glass small">
+          <span class="text-emerald fw-semibold">Save ₹{{ rec.estimated_cost_saving }}/mo</span>
+          <span class="text-muted">{{ rec.estimated_saving_kwh }} kWh</span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

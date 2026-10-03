@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Data Management & CSV Upload{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h2 class="fw-bold mb-1">Energy Data Management</h2>
+    <p class="text-muted small mb-0">Upload consumption telemetry CSV files or enter custom readings manually</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('download_sample_csv') }}" class="btn btn-outline-custom">
+      <i class="bi bi-file-earmark-arrow-down"></i> Download Sample CSV
+    </a>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- 1. CSV File Upload Box -->
+  <div class="col-12 col-lg-6">
+    <div class="glass-card h-100">
+      <div class="glass-card-header">
+        <div>
+          <h5 class="fw-bold mb-0">Upload Energy Telemetry CSV</h5>
+          <span class="text-muted small">Batch ingestion and automated anomaly detection</span>
+        </div>
+        <i class="bi bi-cloud-arrow-up text-emerald fs-4"></i>
+      </div>
+
+      <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+        <div class="p-4 rounded text-center my-3" style="background: var(--bg-glass); border: 2px dashed var(--border-glass);">
+          <i class="bi bi-filetype-csv display-4 text-emerald mb-2"></i>
+          <p class="text-main fw-semibold mb-1">Select or drag & drop your dataset file</p>
+          <p class="text-muted small mb-3">Accepts standard .csv format up to 16MB</p>
+          <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <span class="text-muted small">Current stored records: <strong>{{ total_records_count }}</strong></span>
+          <button type="submit" class="btn btn-primary-custom">
+            <i class="bi bi-upload"></i> Upload & Process
+          </button>
+        </div>
+      </form>
+
+      <!-- Reload Benchmark Dataset -->
+      <div class="mt-4 pt-3 border-top border-glass d-flex justify-content-between align-items-center">
+        <div>
+          <span class="fw-semibold small d-block">Need simulated test data?</span>
+          <span class="text-dim small">Load 1,200 pre-generated academic records</span>
+        </div>
+        <form method="POST" action="{{ url_for('reload_sample_data') }}">
+          <button type="submit" class="btn btn-sm btn-outline-custom">
+            <i class="bi bi-arrow-repeat"></i> Load Benchmark
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Manual Data Entry Form -->
+  <div class="col-12 col-lg-6">
+    <div class="glass-card h-100">
+      <div class="glass-card-header">
+        <div>
+          <h5 class="fw-bold mb-0">Manual Energy Entry</h5>
+          <span class="text-muted small">Log a single hourly or sub-metered reading</span>
+        </div>
+        <i class="bi bi-pencil-square text-cyan fs-4"></i>
+      </div>
+
+      <form method="POST" action="{{ url_for('manual_entry') }}">
+        <div class="row g-2">
+          <div class="col-6">
+            <label class="form-label small fw-semibold text-muted">DATE</label>
+            <input type="date" name="record_date" class="form-control" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-semibold text-muted">TIME</label>
+            <input type="time" name="record_time" class="form-control" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-semibold text-muted">ENERGY CONSUMED (kWh)</label>
+            <input type="number" step="0.01" name="energy_kwh" class="form-control" placeholder="e.g. 1.85" required>
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-semibold text-muted">OCCUPANTS</label>
+            <input type="number" name="occupants" class="form-control" value="2" required>
+          </div>
+          <div class="col-4">
+            <label class="form-label small fw-semibold text-muted">AC (Hrs)</label>
+            <input type="number" step="0.1" name="ac_hours" class="form-control" value="0.0">
+          </div>
+          <div class="col-4">
+            <label class="form-label small fw-semibold text-muted">COMPUTER (Hrs)</label>
+            <input type="number" step="0.1" name="computer_hours" class="form-control" value="0.5">
+          </div>
+          <div class="col-4">
+            <label class="form-label small fw-semibold text-muted">OTHER APPLIANCE</label>
+            <input type="number" step="0.1" name="appliance_hours" class="form-control" value="0.5">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-semibold text-muted">TEMPERATURE (°C)</label>
+            <input type="number" step="0.1" name="temperature" class="form-control" value="28.0">
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-semibold text-muted">HUMIDITY (%)</label>
+            <input type="number" step="1" name="humidity" class="form-control" value="55">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary-custom w-100 justify-content-center mt-3">
+          <i class="bi bi-save"></i> Save Reading
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     CSV DATASET SPECIFICATION SCHEMA
+     ========================================== -->
+<div class="glass-card">
+  <div class="glass-card-header">
+    <h5 class="fw-bold mb-0">Expected CSV File Structure & Schema</h5>
+  </div>
+  <p class="text-muted small mb-3">Ensure your uploaded CSV contains the following standard headers for seamless machine learning parsing:</p>
+
+  <div class="table-responsive">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Column Name</th>
+          <th>Data Type</th>
+          <th>Example</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><code>Date</code></td><td>YYYY-MM-DD</td><td>2025-06-15</td><td>Timestamp date of record</td></tr>
+        <tr><td><code>Time</code></td><td>HH:MM</td><td>14:00</td><td>Timestamp hour of record</td></tr>
+        <tr><td><code>Energy_kWh</code></td><td>Float</td><td>2.85</td><td>Target energy consumption in kWh</td></tr>
+        <tr><td><code>Occupants</code></td><td>Integer</td><td>3</td><td>Number of people present</td></tr>
+        <tr><td><code>Lights</code></td><td>Integer</td><td>4</td><td>Count of active lights</td></tr>
+        <tr><td><code>Fans</code></td><td>Integer</td><td>2</td><td>Count of active fans</td></tr>
+        <tr><td><code>AC_Usage_Hours</code></td><td>Float (0-1)</td><td>1.0</td><td>Air conditioning runtime fraction</td></tr>
+        <tr><td><code>Computer_Usage_Hours</code></td><td>Float (0-1)</td><td>0.8</td><td>Computer/workstation runtime</td></tr>
+        <tr><td><code>Appliance_Operating_Hours</code></td><td>Float</td><td>0.6</td><td>Other appliances runtime</td></tr>
+        <tr><td><code>Temperature</code></td><td>Float</td><td>34.5</td><td>Ambient outdoor temperature in °C</td></tr>
+        <tr><td><code>Humidity</code></td><td>Float</td><td>48.0</td><td>Relative humidity percentage</td></tr>
+        <tr><td><code>Is_Weekend</code></td><td>0 or 1</td><td>0</td><td>1 if Saturday/Sunday, else 0</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

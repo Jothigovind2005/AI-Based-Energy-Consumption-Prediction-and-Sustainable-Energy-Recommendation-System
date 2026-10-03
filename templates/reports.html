@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}Energy Audit & Sustainability Report{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 btn-no-print">
+  <div>
+    <h2 class="fw-bold mb-1">Energy Audit & Sustainability Report</h2>
+    <p class="text-muted small mb-0">Official academic energy audit summary, billing breakdown, and decarbonization scorecard</p>
+  </div>
+  <div class="d-flex gap-2">
+    <button id="printReportBtn" class="btn btn-primary-custom">
+      <i class="bi bi-printer-fill"></i> Print / Save as PDF
+    </button>
+    <a href="{{ url_for('export_csv') }}" class="btn btn-outline-custom">
+      <i class="bi bi-filetype-csv"></i> Download CSV Telemetry
+    </a>
+  </div>
+</div>
+
+<!-- ==========================================
+     EXECUTIVE AUDIT REPORT CONTAINER
+     ========================================== -->
+<div class="glass-card p-4 p-md-5 mb-5">
+  <!-- Report Header -->
+  <div class="d-flex justify-content-between align-items-start border-bottom border-glass pb-4 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <div class="brand-icon" style="width: 36px; height: 36px; font-size: 1.1rem;">
+          <i class="bi bi-lightning-charge-fill"></i>
+        </div>
+        <h4 class="fw-bold mb-0">EcoAI Comprehensive Energy Audit Report</h4>
+      </div>
+      <p class="text-muted small mb-0">Project: AI-Based Energy Consumption Prediction & Sustainable Recommendation System</p>
+    </div>
+    <div class="text-end">
+      <div class="badge badge-normal mb-1">Audit Status: Verified</div>
+      <div class="text-dim small">Generated on: <strong>{{ report_date }}</strong></div>
+      <div class="text-dim small">User: <strong>{{ user.full_name }}</strong> (Tariff: ₹{{ user.tariff_rate }}/kWh)</div>
+    </div>
+  </div>
+
+  <!-- 1. Executive Summary & Consumption Overview -->
+  <div class="mb-4">
+    <h5 class="fw-bold text-emerald mb-3"><i class="bi bi-1-circle-fill me-2"></i>Executive Summary & Power Consumption</h5>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <div class="p-3 rounded bg-glass border border-glass text-center">
+          <span class="text-muted small d-block text-uppercase">Monthly Consumption</span>
+          <span class="fs-4 fw-bold text-main">{{ bill_calc.monthly_kwh }} kWh</span>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="p-3 rounded bg-glass border border-glass text-center">
+          <span class="text-muted small d-block text-uppercase">Monthly Electricity Bill</span>
+          <span class="fs-4 fw-bold text-cyan">₹{{ bill_calc.grand_total }}</span>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="p-3 rounded bg-glass border border-glass text-center">
+          <span class="text-muted small d-block text-uppercase">Monthly CO₂ Emissions</span>
+          <span class="fs-4 fw-bold text-amber">{{ co2_calc.monthly_co2_kg }} kg</span>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="p-3 rounded bg-glass border border-glass text-center">
+          <span class="text-muted small d-block text-uppercase">Annual Optimization Potential</span>
+          <span class="fs-4 fw-bold text-emerald">₹{{ savings_calc.yearly_savings }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Progressive Slab Electricity Tariff Calculation -->
+  <div class="mb-4">
+    <h5 class="fw-bold text-cyan mb-3"><i class="bi bi-2-circle-fill me-2"></i>Progressive Slab Electricity Tariff Breakdown</h5>
+    <div class="table-responsive">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Consumption Slab Tier</th>
+            <th>Units (kWh)</th>
+            <th>Rate per Unit (₹/kWh)</th>
+            <th>Subtotal Cost (₹)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in bill_calc.breakdown %}
+          <tr>
+            <td>Tier {{ loop.index }}</td>
+            <td>{{ b.units }} kWh</td>
+            <td>₹{{ b.rate }}</td>
+            <td class="fw-semibold">₹{{ b.cost }}</td>
+          </tr>
+          {% endfor %}
+          <tr style="background: rgba(0,0,0,0.1);">
+            <td colspan="3" class="text-end fw-semibold">Base Energy Charges:</td>
+            <td class="fw-bold text-main">₹{{ bill_calc.energy_charges }}</td>
+          </tr>
+          <tr>
+            <td colspan="3" class="text-end text-muted small">Fixed Grid & Metering Charges:</td>
+            <td class="text-muted small">₹{{ bill_calc.fixed_charges }}</td>
+          </tr>
+          <tr>
+            <td colspan="3" class="text-end text-muted small">Electricity Duty & Taxes (5%):</td>
+            <td class="text-muted small">₹{{ bill_calc.tax }}</td>
+          </tr>
+          <tr style="background: rgba(6, 182, 212, 0.1);">
+            <td colspan="3" class="text-end fs-6 fw-bold text-cyan">Total Estimated Monthly Invoice:</td>
+            <td class="fs-6 fw-bold text-cyan">₹{{ bill_calc.grand_total }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 3. Carbon Footprint & Decarbonization Scorecard -->
+  <div class="mb-4">
+    <h5 class="fw-bold text-amber mb-3"><i class="bi bi-3-circle-fill me-2"></i>Carbon Footprint & Environmental Impact Scorecard</h5>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="p-3 rounded bg-glass border border-glass">
+          <div class="text-muted small mb-1">ANNUAL GRID CARBON LOAD</div>
+          <div class="fs-4 fw-bold text-amber">{{ co2_calc.yearly_co2_kg }} kg CO₂/year</div>
+          <div class="text-dim small mt-1">Based on standard grid emission factor (0.82 kg/kWh)</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded bg-glass border border-glass">
+          <div class="text-muted small mb-1">TREES REQUIRED FOR COMPLETE OFFSET</div>
+          <div class="fs-4 fw-bold text-emerald">{{ co2_calc.trees_needed_to_offset }} Mature Trees</div>
+          <div class="text-dim small mt-1">1 urban tree absorbs ~21.77 kg CO₂ annually</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded bg-glass border border-glass">
+          <div class="text-muted small mb-1">PASSENGER VEHICLE EMISSION EQUIVALENT</div>
+          <div class="fs-4 fw-bold text-rose">{{ co2_calc.car_km_equivalent }} km driven</div>
+          <div class="text-dim small mt-1">Equivalent passenger vehicle fuel burning per month</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Machine Learning Model Performance Summary -->
+  <div class="mb-4">
+    <h5 class="fw-bold text-indigo mb-3"><i class="bi bi-4-circle-fill me-2"></i>Machine Learning Model Evaluation Benchmarks</h5>
+    <div class="table-responsive">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Model Architecture</th>
+            <th>Mean Absolute Error (MAE)</th>
+            <th>Root Mean Squared Error (RMSE)</th>
+            <th>Coefficient of Determination (R²)</th>
+            <th>MAPE (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for name, m in metrics_meta.models.items() %}
+          <tr {% if name == metrics_meta.best_model %}style="background: rgba(16, 185, 129, 0.08); font-weight: 600;"{% endif %}>
+            <td>
+              {% if name == metrics_meta.best_model %}<i class="bi bi-star-fill text-warning me-1"></i>{% endif %}
+              {{ name }}
+            </td>
+            <td>{{ m.mae }}</td>
+            <td>{{ m.rmse }}</td>
+            <td><span class="badge badge-normal">{{ m.r2_score }}</span></td>
+            <td>{{ m.mape }}%</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 5. Appliance Sub-Meter Inventory Breakdown -->
+  <div class="mb-2">
+    <h5 class="fw-bold text-emerald mb-3"><i class="bi bi-5-circle-fill me-2"></i>Appliance Sub-Meter Inventory & Waste Analysis</h5>
+    <div class="table-responsive">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Appliance</th>
+            <th>Category</th>
+            <th>Rated Wattage</th>
+            <th>Daily Runtime</th>
+            <th>Daily kWh</th>
+            <th>Monthly Share (₹)</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in appliances %}
+          <tr>
+            <td class="fw-semibold">{{ app.appliance_name }}</td>
+            <td><span class="badge badge-normal">{{ app.category }}</span></td>
+            <td>{{ app.rated_power_w }} W</td>
+            <td>{{ app.avg_daily_hours }} hrs/day</td>
+            <td class="fw-bold text-emerald">{{ app.daily_kwh }} kWh</td>
+            <td class="text-cyan">₹{{ app.monthly_cost }}</td>
+            <td>
+              {% if app.status == 'High Usage' %}
+                <span class="badge badge-priority-high">{{ app.status }}</span>
+              {% else %}
+                <span class="badge badge-normal">{{ app.status }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Report Sign-off / Academic Project Notes -->
+  <div class="mt-5 pt-4 border-top border-glass d-flex justify-content-between text-dim small">
+    <div>
+      <div><strong>Institutional CSE Project Verification</strong></div>
+      <div>AI-Driven Sustainable Energy Modeling System (Non-IoT Architecture)</div>
+    </div>
+    <div class="text-end">
+      <div>Report ID: #EA-{{ user.id }}-2025</div>
+      <div>Certified by AI Energy Audit Engine</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

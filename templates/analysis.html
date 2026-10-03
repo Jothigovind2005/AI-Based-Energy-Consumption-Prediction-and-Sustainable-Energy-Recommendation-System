@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Energy Analysis & Exploratory Telemetry{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h2 class="fw-bold mb-1">Energy Consumption Analytics</h2>
+    <p class="text-muted small mb-0">Exploratory data analysis, statistical indicators, and historical anomaly audit</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('upload') }}" class="btn btn-primary-custom">
+      <i class="bi bi-cloud-arrow-up-fill"></i> Upload Dataset
+    </a>
+    <a href="{{ url_for('export_csv') }}" class="btn btn-outline-custom">
+      <i class="bi bi-download"></i> Export CSV
+    </a>
+  </div>
+</div>
+
+<!-- ==========================================
+     STATISTICAL SUMMARY CARDS
+     ========================================== -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="glass-card p-3 text-center h-100">
+      <div class="text-muted small text-uppercase">TOTAL RECORDS</div>
+      <div class="fs-3 fw-bold text-main mt-1">{{ stats.total_records }}</div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="glass-card p-3 text-center h-100">
+      <div class="text-muted small text-uppercase">TOTAL POWER</div>
+      <div class="fs-3 fw-bold text-emerald mt-1">{{ stats.total_kwh }} <span class="fs-6 text-muted">kWh</span></div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="glass-card p-3 text-center h-100">
+      <div class="text-muted small text-uppercase">MEAN USAGE</div>
+      <div class="fs-3 fw-bold text-cyan mt-1">{{ stats.mean_kwh }} <span class="fs-6 text-muted">kWh</span></div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="glass-card p-3 text-center h-100">
+      <div class="text-muted small text-uppercase">PEAK SPIKE</div>
+      <div class="fs-3 fw-bold text-rose mt-1">{{ stats.max_kwh }} <span class="fs-6 text-muted">kWh</span></div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="glass-card p-3 text-center h-100">
+      <div class="text-muted small text-uppercase">AVG TEMP</div>
+      <div class="fs-3 fw-bold text-amber mt-1">{{ stats.avg_temp }}°C</div>
+    </div>
+  </div>
+
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="glass-card p-3 text-center h-100">
+      <div class="text-muted small text-uppercase">ANOMALIES</div>
+      <div class="fs-3 fw-bold text-rose mt-1">{{ stats.anomalies_count }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     DATASET EXPLORATION TABLE
+     ========================================== -->
+<div class="glass-card mb-4">
+  <div class="glass-card-header flex-column flex-md-row gap-3">
+    <div>
+      <h5 class="fw-bold mb-0">Energy Telemetry Logs</h5>
+      <span class="text-muted small">Displaying recent {{ records|length }} recorded hourly snapshots</span>
+    </div>
+    <div class="d-flex align-items-center gap-2 w-100 w-md-auto">
+      <div class="input-group">
+        <span class="input-group-text bg-secondary border-glass text-muted"><i class="bi bi-search"></i></span>
+        <input type="text" id="tableSearchInput" class="form-control" placeholder="Search by date, time, reason...">
+      </div>
+      <form method="POST" action="{{ url_for('reload_sample_data') }}">
+        <button type="submit" class="btn btn-outline-custom text-nowrap" title="Reset and reload 1,200 simulated academic records">
+          <i class="bi bi-arrow-repeat"></i> Reload Benchmark
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="table-responsive" style="max-height: 520px;">
+    <table id="dataTable" class="table-custom">
+      <thead style="position: sticky; top: 0; z-index: 1; background: var(--bg-secondary);">
+        <tr>
+          <th>Timestamp</th>
+          <th>Energy (kWh)</th>
+          <th>Occupants</th>
+          <th>Appliances Load (AC / PC / Other)</th>
+          <th>Temp (°C)</th>
+          <th>Humidity</th>
+          <th>Day Type</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        <tr>
+          <td>
+            <div class="fw-semibold">{{ r.record_date }}</div>
+            <div class="text-muted small">{{ r.record_time }}</div>
+          </td>
+          <td>
+            <span class="fw-bold {% if r.energy_kwh > 3.0 %}text-rose{% elif r.energy_kwh > 1.5 %}text-cyan{% else %}text-emerald{% endif %}">
+              {{ r.energy_kwh }} kWh
+            </span>
+          </td>
+          <td>{{ r.occupants }} people</td>
+          <td>
+            <span class="badge {% if r.ac_hours > 0.5 %}badge-priority-high{% else %}badge-normal{% endif %} me-1">AC: {{ r.ac_hours }}h</span>
+            <span class="badge badge-priority-medium me-1">PC: {{ r.computer_hours }}h</span>
+            <span class="badge badge-priority-low">App: {{ r.appliance_hours }}h</span>
+          </td>
+          <td>{{ r.temperature }}°C</td>
+          <td>{{ r.humidity }}%</td>
+          <td>
+            {% if r.is_weekend == 1 %}
+              <span class="badge badge-priority-medium">Weekend</span>
+            {% else %}
+              <span class="badge badge-priority-low">Weekday</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if r.is_anomaly == 1 %}
+              <span class="badge badge-anomaly" title="{{ r.anomaly_reason }}">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i> Anomaly Spike
+              </span>
+            {% else %}
+              <span class="badge badge-normal">
+                <i class="bi bi-check-circle-fill me-1"></i> Normal
+              </span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

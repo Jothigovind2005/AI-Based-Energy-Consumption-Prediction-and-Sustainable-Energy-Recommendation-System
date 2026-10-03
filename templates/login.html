@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - AI Energy Intelligence{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-75 py-5">
+  <div class="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
+    <div class="glass-card shadow-lg p-4 p-sm-5">
+      <div class="text-center mb-4">
+        <div class="brand-icon mx-auto mb-3" style="width: 54px; height: 54px; font-size: 1.6rem;">
+          <i class="bi bi-lightning-charge-fill"></i>
+        </div>
+        <h3 class="fw-bold mb-1">Welcome Back</h3>
+        <p class="text-muted small">Sign in to your AI Energy Intelligence dashboard</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('login') }}">
+        <div class="mb-3">
+          <label for="username" class="form-label text-muted small fw-semibold">USERNAME OR EMAIL</label>
+          <div class="input-group">
+            <span class="input-group-text bg-secondary border-glass text-muted"><i class="bi bi-person-fill"></i></span>
+            <input type="text" class="form-control" id="username" name="username" placeholder="admin or demo_user" required autofocus>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label for="password" class="form-label text-muted small fw-semibold">PASSWORD</label>
+          <div class="input-group">
+            <span class="input-group-text bg-secondary border-glass text-muted"><i class="bi bi-lock-fill"></i></span>
+            <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary-custom w-100 justify-content-center py-2 fs-6">
+          <i class="bi bi-box-arrow-in-right"></i> Sign In
+        </button>
+      </form>
+
+      <!-- Quick Demo Credentials Box -->
+      <div class="mt-4 p-3 rounded" style="background: var(--bg-glass); border: 1px dashed var(--border-glass);">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small fw-semibold text-emerald"><i class="bi bi-key-fill me-1"></i> Demo Credentials:</span>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-sm btn-outline-custom flex-grow-1" onclick="document.getElementById('username').value='demo_user'; document.getElementById('password').value='password123';">
+            Demo User
+          </button>
+          <button type="button" class="btn btn-sm btn-outline-custom flex-grow-1" onclick="document.getElementById('username').value='admin'; document.getElementById('password').value='admin123';">
+            Admin
+          </button>
+        </div>
+      </div>
+
+      <div class="text-center mt-4">
+        <span class="text-muted small">Don't have an account?</span>
+        <a href="{{ url_for('register') }}" class="fw-semibold ms-1 small">Create one here</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

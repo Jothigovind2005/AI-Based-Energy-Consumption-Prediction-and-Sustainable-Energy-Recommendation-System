@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Sustainable Recommendations Engine{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h2 class="fw-bold mb-1">Sustainable Energy Recommendation Engine</h2>
+    <p class="text-muted small mb-0">AI-driven actionable strategies to reduce electricity waste, cost, and carbon emissions</p>
+  </div>
+</div>
+
+<!-- ==========================================
+     POTENTIAL SAVINGS SUMMARY CARDS
+     ========================================== -->
+<div class="row g-3 mb-4">
+  <div class="col-12 col-md-4">
+    <div class="glass-card text-center p-3">
+      <div class="kpi-label">TOTAL MONTHLY ENERGY SAVINGS</div>
+      <div class="display-6 fw-bold text-emerald mt-1">{{ total_kwh_savings }} <span class="fs-6 text-muted">kWh/month</span></div>
+      <div class="text-dim small mt-1"><i class="bi bi-arrow-down-circle text-emerald me-1"></i> Significant load reduction</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-4">
+    <div class="glass-card text-center p-3">
+      <div class="kpi-label">ESTIMATED FINANCIAL SAVINGS</div>
+      <div class="display-6 fw-bold text-cyan mt-1">₹{{ total_cost_savings }} <span class="fs-6 text-muted">/month</span></div>
+      <div class="text-dim small mt-1"><i class="bi bi-wallet2 text-cyan me-1"></i> Annual savings: ₹{{ total_cost_savings * 12 }}</div>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-4">
+    <div class="glass-card text-center p-3">
+      <div class="kpi-label">CARBON FOOTPRINT MITIGATION</div>
+      <div class="display-6 fw-bold text-amber mt-1">{{ total_co2_savings }} <span class="fs-6 text-muted">kg CO₂/mo</span></div>
+      <div class="text-dim small mt-1"><i class="bi bi-tree text-amber me-1"></i> Equivalent to planting ~{{ (total_co2_savings * 12 / 21.77)|round(1) }} trees</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     RECOMMENDATION CARDS LIST
+     ========================================== -->
+<div class="row g-4 mb-4">
+  {% for rec in recommendations %}
+  <div class="col-12 col-lg-6">
+    <div class="glass-card h-100 rec-card {% if rec.priority == 'High' %}high-priority{% elif rec.priority == 'Medium' %}med-priority{% else %}low-priority{% endif %}">
+      <div class="d-flex justify-content-between align-items-start mb-2">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge badge-normal text-uppercase">{{ rec.category }}</span>
+          <span class="badge {% if rec.priority == 'High' %}badge-priority-high{% elif rec.priority == 'Medium' %}badge-priority-medium{% else %}badge-priority-low{% endif %}">
+            {{ rec.priority }} Priority
+          </span>
+        </div>
+        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+          {{ rec.impact_badge }}
+        </span>
+      </div>
+
+      <h5 class="fw-bold my-2 text-main">{{ rec.title }}</h5>
+      <p class="text-muted small mb-3" style="line-height: 1.6;">{{ rec.description }}</p>
+
+      <div class="p-3 rounded my-2" style="background: var(--bg-glass); border: 1px solid var(--border-glass);">
+        <div class="row g-2 text-center">
+          <div class="col-4">
+            <span class="text-muted small d-block">Energy Saved</span>
+            <span class="fw-bold text-emerald">{{ rec.estimated_saving_kwh }} kWh</span>
+          </div>
+          <div class="col-4">
+            <span class="text-muted small d-block">Cost Saved</span>
+            <span class="fw-bold text-cyan">₹{{ rec.estimated_cost_saving }}</span>
+          </div>
+          <div class="col-4">
+            <span class="text-muted small d-block">CO₂ Avoided</span>
+            <span class="fw-bold text-amber">{{ rec.estimated_co2_saving }} kg</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- ==========================================
+     SAVED / TRACKED RECOMMENDATIONS
+     ========================================== -->
+{% if stored_recommendations %}
+<div class="glass-card">
+  <div class="glass-card-header">
+    <div>
+      <h5 class="fw-bold mb-0">Track Recommendation Implementation</h5>
+      <span class="text-muted small">Mark measures you have applied in your living space</span>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Action Title</th>
+          <th>Monthly Savings</th>
+          <th>Priority</th>
+          <th>Implementation Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in stored_recommendations %}
+        <tr>
+          <td class="text-muted">{{ r.category }}</td>
+          <td class="fw-semibold">{{ r.title }}</td>
+          <td class="text-emerald fw-bold">₹{{ r.estimated_cost_saving }}</td>
+          <td>
+            <span class="badge {% if r.priority == 'High' %}badge-priority-high{% elif r.priority == 'Medium' %}badge-priority-medium{% else %}badge-priority-low{% endif %}">
+              {{ r.priority }}
+            </span>
+          </td>
+          <td>
+            {% if r.is_implemented == 1 %}
+              <span class="badge badge-normal"><i class="bi bi-check-circle-fill me-1"></i> Implemented</span>
+            {% else %}
+              <span class="badge badge-priority-medium"><i class="bi bi-hourglass-split me-1"></i> In Progress</span>
+            {% endif %}
+          </td>
+          <td>
+            <form method="POST" action="{{ url_for('toggle_recommendation', rec_id=r.id) }}">
+              <button type="submit" class="btn btn-sm btn-outline-custom">
+                {% if r.is_implemented == 1 %}Mark Active{% else %}Mark Done{% endif %}
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

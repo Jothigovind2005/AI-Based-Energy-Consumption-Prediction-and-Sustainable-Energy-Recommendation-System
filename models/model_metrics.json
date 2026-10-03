@@ -1,0 +1,414 @@
+{
+    "best_model": "Gradient Boosting",
+    "best_r2_score": 0.8943,
+    "models": {
+        "Linear Regression": {
+            "name": "Linear Regression",
+            "mae": 0.0944,
+            "rmse": 0.1815,
+            "r2_score": 0.7678,
+            "mape": 12.12
+        },
+        "Decision Tree": {
+            "name": "Decision Tree",
+            "mae": 0.1084,
+            "rmse": 0.159,
+            "r2_score": 0.8217,
+            "mape": 15.25
+        },
+        "Random Forest": {
+            "name": "Random Forest",
+            "mae": 0.0929,
+            "rmse": 0.1655,
+            "r2_score": 0.8069,
+            "mape": 12.63
+        },
+        "Gradient Boosting": {
+            "name": "Gradient Boosting",
+            "mae": 0.077,
+            "rmse": 0.1224,
+            "r2_score": 0.8943,
+            "mape": 11.35
+        }
+    },
+    "comparison_samples": [
+        {
+            "sample_index": 1,
+            "actual": 0.728,
+            "predicted_best": 0.64,
+            "predicted_lr": 0.741,
+            "predicted_dt": 0.592,
+            "predicted_rf": 0.815,
+            "predicted_gb": 0.64
+        },
+        {
+            "sample_index": 2,
+            "actual": 0.401,
+            "predicted_best": 0.593,
+            "predicted_lr": 0.542,
+            "predicted_dt": 0.592,
+            "predicted_rf": 0.561,
+            "predicted_gb": 0.593
+        },
+        {
+            "sample_index": 3,
+            "actual": 0.742,
+            "predicted_best": 0.676,
+            "predicted_lr": 0.681,
+            "predicted_dt": 0.592,
+            "predicted_rf": 0.722,
+            "predicted_gb": 0.676
+        },
+        {
+            "sample_index": 4,
+            "actual": 0.572,
+            "predicted_best": 0.703,
+            "predicted_lr": 0.685,
+            "predicted_dt": 0.592,
+            "predicted_rf": 0.685,
+            "predicted_gb": 0.703
+        },
+        {
+            "sample_index": 5,
+            "actual": 1.085,
+            "predicted_best": 0.977,
+            "predicted_lr": 1.027,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.905,
+            "predicted_gb": 0.977
+        },
+        {
+            "sample_index": 6,
+            "actual": 1.009,
+            "predicted_best": 0.893,
+            "predicted_lr": 0.985,
+            "predicted_dt": 0.993,
+            "predicted_rf": 0.89,
+            "predicted_gb": 0.893
+        },
+        {
+            "sample_index": 7,
+            "actual": 0.818,
+            "predicted_best": 0.811,
+            "predicted_lr": 0.917,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.816,
+            "predicted_gb": 0.811
+        },
+        {
+            "sample_index": 8,
+            "actual": 0.762,
+            "predicted_best": 0.847,
+            "predicted_lr": 0.914,
+            "predicted_dt": 0.712,
+            "predicted_rf": 0.798,
+            "predicted_gb": 0.847
+        },
+        {
+            "sample_index": 9,
+            "actual": 0.594,
+            "predicted_best": 0.647,
+            "predicted_lr": 0.604,
+            "predicted_dt": 0.592,
+            "predicted_rf": 0.694,
+            "predicted_gb": 0.647
+        },
+        {
+            "sample_index": 10,
+            "actual": 0.719,
+            "predicted_best": 0.713,
+            "predicted_lr": 0.767,
+            "predicted_dt": 0.712,
+            "predicted_rf": 0.736,
+            "predicted_gb": 0.713
+        },
+        {
+            "sample_index": 11,
+            "actual": 0.794,
+            "predicted_best": 0.907,
+            "predicted_lr": 0.854,
+            "predicted_dt": 0.853,
+            "predicted_rf": 0.911,
+            "predicted_gb": 0.907
+        },
+        {
+            "sample_index": 12,
+            "actual": 0.882,
+            "predicted_best": 0.864,
+            "predicted_lr": 0.95,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.843,
+            "predicted_gb": 0.864
+        },
+        {
+            "sample_index": 13,
+            "actual": 0.812,
+            "predicted_best": 0.708,
+            "predicted_lr": 0.751,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.754,
+            "predicted_gb": 0.708
+        },
+        {
+            "sample_index": 14,
+            "actual": 0.864,
+            "predicted_best": 0.915,
+            "predicted_lr": 1.039,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.874,
+            "predicted_gb": 0.915
+        },
+        {
+            "sample_index": 15,
+            "actual": 0.67,
+            "predicted_best": 0.774,
+            "predicted_lr": 0.871,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.771,
+            "predicted_gb": 0.774
+        },
+        {
+            "sample_index": 16,
+            "actual": 0.312,
+            "predicted_best": 0.348,
+            "predicted_lr": 0.339,
+            "predicted_dt": 0.355,
+            "predicted_rf": 0.362,
+            "predicted_gb": 0.348
+        },
+        {
+            "sample_index": 17,
+            "actual": 0.806,
+            "predicted_best": 0.758,
+            "predicted_lr": 0.823,
+            "predicted_dt": 0.592,
+            "predicted_rf": 0.769,
+            "predicted_gb": 0.758
+        },
+        {
+            "sample_index": 18,
+            "actual": 0.817,
+            "predicted_best": 0.71,
+            "predicted_lr": 0.685,
+            "predicted_dt": 0.592,
+            "predicted_rf": 0.701,
+            "predicted_gb": 0.71
+        },
+        {
+            "sample_index": 19,
+            "actual": 0.845,
+            "predicted_best": 0.8,
+            "predicted_lr": 0.891,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.791,
+            "predicted_gb": 0.8
+        },
+        {
+            "sample_index": 20,
+            "actual": 0.22,
+            "predicted_best": 0.333,
+            "predicted_lr": 0.245,
+            "predicted_dt": 0.264,
+            "predicted_rf": 0.299,
+            "predicted_gb": 0.333
+        },
+        {
+            "sample_index": 21,
+            "actual": 0.563,
+            "predicted_best": 0.663,
+            "predicted_lr": 0.643,
+            "predicted_dt": 0.712,
+            "predicted_rf": 0.68,
+            "predicted_gb": 0.663
+        },
+        {
+            "sample_index": 22,
+            "actual": 0.688,
+            "predicted_best": 0.675,
+            "predicted_lr": 0.72,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.703,
+            "predicted_gb": 0.675
+        },
+        {
+            "sample_index": 23,
+            "actual": 0.815,
+            "predicted_best": 0.72,
+            "predicted_lr": 0.81,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.743,
+            "predicted_gb": 0.72
+        },
+        {
+            "sample_index": 24,
+            "actual": 1.019,
+            "predicted_best": 1.022,
+            "predicted_lr": 1.157,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.961,
+            "predicted_gb": 1.022
+        },
+        {
+            "sample_index": 25,
+            "actual": 0.695,
+            "predicted_best": 0.736,
+            "predicted_lr": 0.726,
+            "predicted_dt": 0.853,
+            "predicted_rf": 0.788,
+            "predicted_gb": 0.736
+        },
+        {
+            "sample_index": 26,
+            "actual": 0.925,
+            "predicted_best": 1.155,
+            "predicted_lr": 1.105,
+            "predicted_dt": 1.129,
+            "predicted_rf": 1.239,
+            "predicted_gb": 1.155
+        },
+        {
+            "sample_index": 27,
+            "actual": 0.853,
+            "predicted_best": 0.779,
+            "predicted_lr": 0.782,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.761,
+            "predicted_gb": 0.779
+        },
+        {
+            "sample_index": 28,
+            "actual": 0.826,
+            "predicted_best": 0.768,
+            "predicted_lr": 0.824,
+            "predicted_dt": 0.592,
+            "predicted_rf": 0.79,
+            "predicted_gb": 0.768
+        },
+        {
+            "sample_index": 29,
+            "actual": 0.289,
+            "predicted_best": 0.333,
+            "predicted_lr": 0.249,
+            "predicted_dt": 0.264,
+            "predicted_rf": 0.287,
+            "predicted_gb": 0.333
+        },
+        {
+            "sample_index": 30,
+            "actual": 0.18,
+            "predicted_best": 0.333,
+            "predicted_lr": 0.236,
+            "predicted_dt": 0.264,
+            "predicted_rf": 0.288,
+            "predicted_gb": 0.333
+        },
+        {
+            "sample_index": 31,
+            "actual": 0.607,
+            "predicted_best": 0.7,
+            "predicted_lr": 0.669,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.74,
+            "predicted_gb": 0.7
+        },
+        {
+            "sample_index": 32,
+            "actual": 0.73,
+            "predicted_best": 0.657,
+            "predicted_lr": 0.554,
+            "predicted_dt": 0.712,
+            "predicted_rf": 0.74,
+            "predicted_gb": 0.657
+        },
+        {
+            "sample_index": 33,
+            "actual": 0.536,
+            "predicted_best": 0.696,
+            "predicted_lr": 0.641,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.736,
+            "predicted_gb": 0.696
+        },
+        {
+            "sample_index": 34,
+            "actual": 0.79,
+            "predicted_best": 0.842,
+            "predicted_lr": 0.922,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.958,
+            "predicted_gb": 0.842
+        },
+        {
+            "sample_index": 35,
+            "actual": 0.368,
+            "predicted_best": 0.341,
+            "predicted_lr": 0.288,
+            "predicted_dt": 0.264,
+            "predicted_rf": 0.327,
+            "predicted_gb": 0.341
+        },
+        {
+            "sample_index": 36,
+            "actual": 0.821,
+            "predicted_best": 0.925,
+            "predicted_lr": 0.919,
+            "predicted_dt": 0.993,
+            "predicted_rf": 0.876,
+            "predicted_gb": 0.925
+        },
+        {
+            "sample_index": 37,
+            "actual": 0.977,
+            "predicted_best": 0.892,
+            "predicted_lr": 1.034,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.847,
+            "predicted_gb": 0.892
+        },
+        {
+            "sample_index": 38,
+            "actual": 0.699,
+            "predicted_best": 0.775,
+            "predicted_lr": 0.941,
+            "predicted_dt": 0.81,
+            "predicted_rf": 0.774,
+            "predicted_gb": 0.775
+        },
+        {
+            "sample_index": 39,
+            "actual": 0.567,
+            "predicted_best": 0.629,
+            "predicted_lr": 0.687,
+            "predicted_dt": 0.712,
+            "predicted_rf": 0.637,
+            "predicted_gb": 0.629
+        },
+        {
+            "sample_index": 40,
+            "actual": 0.718,
+            "predicted_best": 0.754,
+            "predicted_lr": 0.833,
+            "predicted_dt": 0.712,
+            "predicted_rf": 0.757,
+            "predicted_gb": 0.754
+        }
+    ],
+    "feature_names": [
+        "Occupants",
+        "Lights",
+        "Fans",
+        "AC_Usage_Hours",
+        "Computer_Usage_Hours",
+        "Appliance_Operating_Hours",
+        "Temperature",
+        "Humidity",
+        "Is_Weekend",
+        "Hour",
+        "Month",
+        "Cooling_Degree",
+        "Total_Appliance_Hours"
+    ],
+    "total_training_samples": 960,
+    "total_testing_samples": 240,
+    "last_trained": "2026-10-03 11:50:59"
+}

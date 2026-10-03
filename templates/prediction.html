@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}AI Energy Prediction Engine{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+  <div>
+    <h2 class="fw-bold mb-1">AI Energy Consumption Prediction Engine</h2>
+    <p class="text-muted small mb-0">Simulate custom operational parameters and compare Machine Learning algorithms in real-time</p>
+  </div>
+  <div>
+    <span class="badge badge-normal px-3 py-2 fs-6">
+      <i class="bi bi-cpu-fill me-1"></i> Trained Model: {{ prediction_result.best_model_name }}
+    </span>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Left Column: Interactive Prediction Form -->
+  <div class="col-12 col-xl-7">
+    <div class="glass-card h-100">
+      <div class="glass-card-header">
+        <div>
+          <h5 class="fw-bold mb-0">Operational Parameter Simulation</h5>
+          <span class="text-muted small">Adjust sliders to forecast instant and long-term electricity consumption</span>
+        </div>
+      </div>
+
+      <form id="predictionForm" method="POST" action="{{ url_for('prediction') }}">
+        <div class="row g-3">
+          <!-- Model Selection -->
+          <div class="col-12 mb-2">
+            <label for="model_name" class="form-label fw-semibold small text-muted">SELECT MACHINE LEARNING ALGORITHM</label>
+            <select class="form-select" id="model_name" name="model_name">
+              <option value="Gradient Boosting" {% if form_data.model_name == 'Gradient Boosting' %}selected{% endif %}>★ Gradient Boosting Regressor (Recommended - Highest R²)</option>
+              <option value="Random Forest" {% if form_data.model_name == 'Random Forest' %}selected{% endif %}>Random Forest Regressor (Ensemble Bagging)</option>
+              <option value="Decision Tree" {% if form_data.model_name == 'Decision Tree' %}selected{% endif %}>Decision Tree Regressor (Recursive MSE)</option>
+              <option value="Linear Regression" {% if form_data.model_name == 'Linear Regression' %}selected{% endif %}>Linear Regression (Ordinary Least Squares / Ridge)</option>
+            </select>
+          </div>
+
+          <!-- Ambient Temperature -->
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label for="temperature" class="form-label small fw-semibold text-muted mb-0">TEMPERATURE (°C)</label>
+              <span id="temperatureVal" class="badge badge-priority-medium">{{ form_data.temperature }}</span>
+            </div>
+            <input type="range" class="form-range slider-sync" id="temperature" name="temperature" min="15" max="45" step="0.5" value="{{ form_data.temperature }}">
+          </div>
+
+          <!-- Humidity -->
+          <div class="col-md-6">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label for="humidity" class="form-label small fw-semibold text-muted mb-0">HUMIDITY (%)</label>
+              <span id="humidityVal" class="badge badge-normal">{{ form_data.humidity }}</span>
+            </div>
+            <input type="range" class="form-range slider-sync" id="humidity" name="humidity" min="20" max="90" step="1" value="{{ form_data.humidity }}">
+          </div>
+
+          <!-- Occupants -->
+          <div class="col-md-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label for="occupants" class="form-label small fw-semibold text-muted mb-0">OCCUPANTS</label>
+              <span id="occupantsVal" class="badge badge-normal">{{ form_data.occupants }}</span>
+            </div>
+            <input type="range" class="form-range slider-sync" id="occupants" name="occupants" min="0" max="8" step="1" value="{{ form_data.occupants }}">
+          </div>
+
+          <!-- Lights Count -->
+          <div class="col-md-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label for="lights" class="form-label small fw-semibold text-muted mb-0">ACTIVE LIGHTS</label>
+              <span id="lightsVal" class="badge badge-normal">{{ form_data.lights }}</span>
+            </div>
+            <input type="range" class="form-range slider-sync" id="lights" name="lights" min="0" max="16" step="1" value="{{ form_data.lights }}">
+          </div>
+
+          <!-- Fans Count -->
+          <div class="col-md-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label for="fans" class="form-label small fw-semibold text-muted mb-0">ACTIVE FANS</label>
+              <span id="fansVal" class="badge badge-normal">{{ form_data.fans }}</span>
+            </div>
+            <input type="range" class="form-range slider-sync" id="fans" name="fans" min="0" max="8" step="1" value="{{ form_data.fans }}">
+          </div>
+
+          <!-- AC Usage Hours -->
+          <div class="col-md-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label for="ac_hours" class="form-label small fw-semibold text-muted mb-0">AC RUNTIME (Hrs/slot)</label>
+              <span id="ac_hoursVal" class="badge badge-priority-high">{{ form_data.ac_hours }}</span>
+            </div>
+            <input type="range" class="form-range slider-sync" id="ac_hours" name="ac_hours" min="0" max="1" step="0.05" value="{{ form_data.ac_hours }}">
+          </div>
+
+          <!-- Computer Usage Hours -->
+          <div class="col-md-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label for="computer_hours" class="form-label small fw-semibold text-muted mb-0">COMPUTER (Hrs/slot)</label>
+              <span id="computer_hoursVal" class="badge badge-normal">{{ form_data.computer_hours }}</span>
+            </div>
+            <input type="range" class="form-range slider-sync" id="computer_hours" name="computer_hours" min="0" max="1" step="0.05" value="{{ form_data.computer_hours }}">
+          </div>
+
+          <!-- Other Appliances Hours -->
+          <div class="col-md-4">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label for="appliance_hours" class="form-label small fw-semibold text-muted mb-0">OTHER APPLIANCES (Hrs)</label>
+              <span id="appliance_hoursVal" class="badge badge-normal">{{ form_data.appliance_hours }}</span>
+            </div>
+            <input type="range" class="form-range slider-sync" id="appliance_hours" name="appliance_hours" min="0" max="1.5" step="0.05" value="{{ form_data.appliance_hours }}">
+          </div>
+
+          <!-- Weekend Toggle -->
+          <div class="col-12 mt-2">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="is_weekend" name="is_weekend" value="1" {% if form_data.is_weekend == 1 %}checked{% endif %}>
+              <label class="form-check-label small" for="is_weekend">Weekend Usage Pattern (Higher residential occupancy)</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4 pt-3 border-top border-glass">
+          <button type="submit" class="btn btn-primary-custom flex-grow-1">
+            <i class="bi bi-save-fill"></i> Execute & Log Prediction
+          </button>
+          <button type="reset" class="btn btn-outline-custom" onclick="setTimeout(performLivePrediction, 100);">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Right Column: AI Projection Output Cards -->
+  <div class="col-12 col-xl-5">
+    <div class="glass-card h-100 d-flex flex-column justify-content-between">
+      <div class="glass-card-header">
+        <div>
+          <h5 class="fw-bold mb-0">Predicted Consumption & Impact</h5>
+          <span class="text-muted small">Generated via <strong class="text-emerald">{{ prediction_result.chosen_model }}</strong></span>
+        </div>
+        <i class="bi bi-lightning-charge-fill text-warning fs-4"></i>
+      </div>
+
+      <!-- Main Forecast Value -->
+      <div class="p-4 rounded text-center my-2" style="background: var(--bg-glass); border: 1px solid var(--border-glow);">
+        <div class="text-muted small text-uppercase fw-semibold mb-1">Instant Projected Hourly Load</div>
+        <div id="livePredictedKwh" class="display-5 fw-bold text-emerald" style="font-family: 'Outfit', sans-serif;">
+          {{ prediction_result.predicted_hourly_kwh }} kWh
+        </div>
+        <div class="text-dim small mt-1">
+          Estimated Daily Total: <strong id="liveDailyKwh" class="text-main">{{ prediction_result.predicted_daily_kwh }} kWh/day</strong>
+        </div>
+      </div>
+
+      <!-- Financial & Environmental Forecast Grid -->
+      <div class="row g-2 mb-3">
+        <div class="col-6">
+          <div class="p-3 rounded" style="background: var(--bg-glass); border: 1px solid var(--border-glass);">
+            <div class="text-muted small">MONTHLY BILL</div>
+            <div id="liveMonthlyCost" class="fs-4 fw-bold text-cyan">₹{{ prediction_result.monthly_cost }}</div>
+            <div class="text-dim small">Yearly: ₹{{ prediction_result.yearly_cost }}</div>
+          </div>
+        </div>
+
+        <div class="col-6">
+          <div class="p-3 rounded" style="background: var(--bg-glass); border: 1px solid var(--border-glass);">
+            <div class="text-muted small">CARBON FOOTPRINT</div>
+            <div id="liveMonthlyCo2" class="fs-4 fw-bold text-amber">{{ prediction_result.monthly_co2_kg }} kg</div>
+            <div class="text-dim small">Offset: ~{{ prediction_result.trees_needed }} trees</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model Performance Metrics Card -->
+      <div class="p-3 rounded border border-glass" style="background: rgba(0,0,0,0.15);">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="small fw-semibold text-muted text-uppercase">Algorithm Accuracy Metrics</span>
+          <span class="badge badge-normal">R² Score: {{ prediction_result.metrics.r2_score }}</span>
+        </div>
+        <div class="d-flex justify-content-between small text-dim">
+          <span>MAE: <strong>{{ prediction_result.metrics.mae }}</strong></span>
+          <span>RMSE: <strong>{{ prediction_result.metrics.rmse }}</strong></span>
+          <span>MAPE: <strong>{{ prediction_result.metrics.mape }}%</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     ALGORITHM COMPARISON & ACTUAL VS PREDICTED CHART
+     ========================================== -->
+<div class="row g-4 mb-4">
+  <!-- Live Multi-Model Comparison Table -->
+  <div class="col-12 col-lg-5">
+    <div class="glass-card h-100">
+      <div class="glass-card-header">
+        <div>
+          <h5 class="fw-bold mb-0">Side-by-Side Model Comparison</h5>
+          <span class="text-muted small">Current input evaluated against all 4 models</span>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Algorithm</th>
+              <th>Predicted (kWh)</th>
+              <th>R² Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for model_name, pred_val in prediction_result.model_comparisons.items() %}
+            <tr {% if model_name == prediction_result.chosen_model %}style="background: rgba(16, 185, 129, 0.1); font-weight: bold;"{% endif %}>
+              <td>
+                {% if model_name == prediction_result.best_model_name %}<i class="bi bi-star-fill text-warning me-1"></i>{% endif %}
+                {{ model_name }}
+              </td>
+              <td data-model-pred="{{ model_name }}" class="text-emerald">{{ pred_val }} kWh</td>
+              <td>
+                <span class="badge badge-normal">
+                  {{ metrics_meta.models[model_name].r2_score if model_name in metrics_meta.models else '0.85' }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actual vs Predicted Line Chart -->
+  <div class="col-12 col-lg-7">
+    <div class="glass-card h-100">
+      <div class="glass-card-header">
+        <div>
+          <h5 class="fw-bold mb-0">Actual vs. AI Predicted Energy Verification</h5>
+          <span class="text-muted small">Evaluation on test partition samples</span>
+        </div>
+      </div>
+      <div style="height: 260px; position: relative;">
+        <canvas id="actualVsPredictedChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     RECENT PREDICTION HISTORY TABLE
+     ========================================== -->
+{% if history %}
+<div class="glass-card">
+  <div class="glass-card-header">
+    <h5 class="fw-bold mb-0">Saved Prediction History</h5>
+  </div>
+  <div class="table-responsive">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Model</th>
+          <th>Temp (°C)</th>
+          <th>Occupants</th>
+          <th>AC Hrs</th>
+          <th>Forecast (kWh)</th>
+          <th>Est. Monthly Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for h in history %}
+        <tr>
+          <td class="text-muted small">{{ h.created_at }}</td>
+          <td><span class="badge badge-normal">{{ h.model_used }}</span></td>
+          <td>{{ h.temperature }}°C</td>
+          <td>{{ h.occupants }}</td>
+          <td>{{ h.ac_hours }}h</td>
+          <td class="fw-bold text-emerald">{{ h.predicted_kwh }} kWh</td>
+          <td>₹{{ h.monthly_cost_est }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const samplePoints = {{ metrics_meta.comparison_samples | tojson }};
+  if (document.getElementById('actualVsPredictedChart') && samplePoints) {
+    ChartManager.renderActualVsPredicted('actualVsPredictedChart', samplePoints);
+  }
+});
+</script>
+{% endblock %}
